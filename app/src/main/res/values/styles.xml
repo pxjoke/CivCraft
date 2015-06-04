@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- Base application theme. -->
+
+
+        <!-- your theme inherits from the material theme -->
+        <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar.Fullscreen">
+            <!-- theme customizations -->
+        </style>
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+</resources>
