@@ -1,14 +1,35 @@
 package com.example.ginvaell.db_ex;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.LruCache;
 import android.widget.ImageView;
 
 /**
  * Created by pxjoke on 06.06.15.
  */
 public class BitmapLoader {
+    private LruCache<String, Bitmap> mMemoryCache;
+   // private final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+    //private final int cacheSize = maxMemory / 8;
+    private Bitmap bitmap;
+    private Context mContext;
+    private int resId;
+    public BitmapLoader(Context context){
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        mContext = context;
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+    }
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             mMemoryCache.put(key, bitmap);
@@ -19,19 +40,20 @@ public class BitmapLoader {
         return mMemoryCache.get(key);
     }
 
-    public void loadBitmap(int resId, ImageView mImageView, String name, int redWidth, int regHeight) {
+    public void load(String resName, ImageView mImageView, int redWidth, int regHeight) {
+        resId =  mContext.getResources().getIdentifier(resName, "drawable",mContext.getPackageName());
         final String imageKey = String.valueOf(resId);
 
-        myBitmap1 = getBitmapFromMemCache(name);
-        if (myBitmap1 != null) {
-            mImageView.setImageBitmap(myBitmap1);
+        bitmap = getBitmapFromMemCache(imageKey);
+        if (bitmap != null) {
+            mImageView.setImageBitmap(bitmap);
             System.out.println("Image used.");
 
         } else {
             //mImageView.setImageResource(R.drawable.none);
-            myBitmap1 = decodeSampledBitmapFromResource(getResources(), resId, redWidth, regHeight);
-            addBitmapToMemoryCache(String.valueOf(name), myBitmap1);
-            mImageView.setImageBitmap(myBitmap1);
+            bitmap = decodeSampledBitmapFromResource(mContext.getResources(), resId, redWidth, regHeight);
+            addBitmapToMemoryCache(String.valueOf(imageKey), bitmap);
+            mImageView.setImageBitmap(bitmap);
             System.out.println("Image decoded.");
 
         }
