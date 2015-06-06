@@ -30,8 +30,8 @@
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="150dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_bar_height"
         android:gravity="center"
         android:id="@+id/linearLayout"
         android:background="@drawable/top_back"
@@ -66,29 +66,29 @@
             <!--android:visibility="invisible"/>-->
 
         <ImageButton
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="@dimen/chosen_element_width"
+            android:layout_height="@dimen/chosen_element_width"
             android:id="@+id/leftButton"
-            android:layout_margin="15dp"
             android:scaleType="fitXY"
             android:onClick="onLeftClick"
             android:nestedScrollingEnabled="true"
-            android:longClickable="true" />
+            android:longClickable="true"
+            android:contentDescription="leftChosenEl" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:text="+"
-            android:textSize="50dp"
+            android:textSize="@dimen/top_sign_text_size"
             android:gravity="center_vertical"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp" />
 
         <ImageButton
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="@dimen/chosen_element_width"
+            android:layout_height="@dimen/chosen_element_width"
             android:id="@+id/imageRight"
-            android:layout_margin="15dp"
             android:scaleType="fitXY"
-            style="@style/Base.Theme.AppCompat.Light"
             android:onClick="onRightClick"
             android:textAlignment="center" />
 
@@ -96,22 +96,23 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:text="="
-            android:textSize="50dp"
+            android:textSize="@dimen/top_sign_text_size"
             android:gravity="center_vertical"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp" />
 
         <ImageButton
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="@dimen/chosen_element_width"
+            android:layout_height="@dimen/chosen_element_width"
             android:id="@+id/imageCenter"
-            android:layout_margin="15dp"
             android:scaleType="fitXY"
             android:onClick="onCenterClick" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/left_bar_width"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout"
         android:layout_alignParentLeft="true"
@@ -121,7 +122,7 @@
         android:id="@+id/linearLayout2"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="false"
-        android:padding="10dp"
+        android:padding="@dimen/cat_layout_padding"
 
         android:background="#ffe5e5e5">
 
@@ -137,16 +138,15 @@
             <!--android:textColor="#ffffff" />-->
 
         <Button
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Природа"
             android:id="@+id/catNature"
-            style="?android:attr/borderlessButtonStyle"
-            android:textSize="10dp"
+            android:textSize="@dimen/cat_button_text_size"
             android:onClick="onCatClick"
             android:layout_marginTop="5dp"
             android:textColor="#ffffff"
-            android:background="#388e3c" />
+            android:background="@color/cat_environment" />
 
         <Button
             android:layout_width="fill_parent"
@@ -154,12 +154,11 @@
             android:text="Инструменты"
             android:id="@+id/catTools"
             style="?android:attr/borderlessButtonStyle"
-            android:textSize="10dp"
+            android:textSize="@dimen/cat_button_text_size"
             android:onClick="onCatClick"
             android:layout_marginTop="5dp"
-            android:background="#009688"
-            android:textColor="#ffffff"
-            android:padding="5dp" />
+            android:background="@color/cat_tools"
+            android:textColor="#ffffff" />
 
         <Button
             android:layout_width="fill_parent"
@@ -167,10 +166,10 @@
             android:text="Комфорт"
             android:id="@+id/catComfort"
             style="?android:attr/borderlessButtonStyle"
-            android:textSize="10dp"
+            android:textSize="@dimen/cat_button_text_size"
             android:onClick="onCatClick"
             android:layout_marginTop="5dp"
-            android:background="#455a64"
+            android:background="@color/cat_comfort"
             android:textColor="#ffffff" />
 
         <Button
@@ -179,10 +178,10 @@
             android:text="Животные"
             android:id="@+id/catAnimals"
             style="?android:attr/borderlessButtonStyle"
-            android:textSize="10dp"
+            android:textSize="@dimen/cat_button_text_size"
             android:onClick="onCatClick"
             android:layout_marginTop="5dp"
-            android:background="#d32f2f"
+            android:background="@color/cat_animals"
             android:textColor="#ffffff" />
 
         <Button
@@ -191,10 +190,10 @@
             android:text="Материалы"
             android:id="@+id/catMaterials"
             style="?android:attr/borderlessButtonStyle"
-            android:textSize="10dp"
+            android:textSize="@dimen/cat_button_text_size"
             android:onClick="onCatClick"
             android:layout_marginTop="5dp"
-            android:background="#5d4037"
+            android:background="@color/cat_materials"
             android:textColor="#ffffff" />
 
         <Button
@@ -203,27 +202,27 @@
             android:text="Все"
             android:id="@+id/catAll"
             style="?android:attr/borderlessButtonStyle"
-            android:textSize="10dp"
+            android:textSize="@dimen/cat_button_text_size"
             android:onClick="onCatClick"
             android:layout_marginTop="5dp"
-            android:background="#616161"
+            android:background="@color/cat_all"
             android:textColor="#ffffff" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:gravity="bottom"
             android:orientation="vertical"
             android:layout_gravity="bottom"
             android:layout_weight="1">
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Заново"
                 android:id="@+id/showSetting"
                 style="?android:attr/borderlessButtonStyle"
-                android:textSize="14sp"
+                android:textSize="@dimen/cat_button_text_size"
                 android:onClick="onClearClick"
                 android:layout_marginTop="5dp"
                 android:background="#bdbdbd"
@@ -237,7 +236,7 @@
 
     <GridView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/list"
         android:columnWidth="90dp"
         android:numColumns="auto_fit"
@@ -251,7 +250,7 @@
         android:layout_alignParentBottom="true"
         android:padding="15dp"
         android:background="@drawable/grid_back"
-        />
+        android:layout_gravity="center" />
 
 
 </RelativeLayout>

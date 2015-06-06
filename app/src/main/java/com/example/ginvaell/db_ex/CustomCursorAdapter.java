@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,25 @@ public class CustomCursorAdapter extends CursorAdapter {
 
     private LayoutInflater mInflater;
     private Context mContext;
-    public CustomCursorAdapter(Context context, Cursor c, int flags) {
+    private LruCache<String, Bitmap> mMemoryCache;
+    public CustomCursorAdapter(Context context, Cursor c, int flags, LruCache<String, Bitmap> mMemoryC) {
         super(context, c, flags);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mContext = context;
+        mMemoryCache = mMemoryC;
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
 
@@ -48,10 +64,11 @@ public class CustomCursorAdapter extends CursorAdapter {
         ImageView img = (ImageView)view.findViewById(R.id.imagepart);
         //img.setImageURI(URI.parse("file://mnt/sdcard/cat.jpg"));
         //String imgName = cursor.getString(3); cursor.getString(3)
-        Bitmap myBitmap1 = decodeSampledBitmapFromResource(mContext.getResources(), mContext.getResources().getIdentifier( cursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), 100, 100);
+       // Bitmap myBitmap1 = decodeSampledBitmapFromResource(mContext.getResources(), mContext.getResources().getIdentifier( cursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), 100, 100);
         //imageView.setImageBitmap(myBitmap1);
 
-        img.setImageBitmap(myBitmap1);
+        //img.setImageBitmap(myBitmap1);
+        loadBitmap(mContext.getResources().getIdentifier( cursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), img, cursor.getString(3), 100, 100);
 
     }
 
@@ -92,6 +109,31 @@ public class CustomCursorAdapter extends CursorAdapter {
         }
 
         return inSampleSize;
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    public void loadBitmap(int resId, ImageView mImageView, String name, int redWidth, int regHeight) {
+        final String imageKey = String.valueOf(resId);
+
+        Bitmap bitmap = getBitmapFromMemCache(imageKey);
+        if (bitmap != null) {
+            mImageView.setImageBitmap(bitmap);
+        } else {
+            //mImageView.setImageResource(R.drawable.none);
+            bitmap = decodeSampledBitmapFromResource(mContext.getResources(), resId, redWidth, regHeight);
+            mImageView.setImageBitmap(bitmap);
+            addBitmapToMemoryCache(String.valueOf(name), bitmap);
+        }
+
     }
 
     public String colorByCat(int cat)

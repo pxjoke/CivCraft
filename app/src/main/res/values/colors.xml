@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cat_environment">#388e3c</color>
+    <color name="cat_tools">#009688</color>
+    <color name="cat_comfort">#455a64</color>
+    <color name="cat_animals">#d32f2f</color>
+    <color name="cat_materials">#5d4037</color>
+    <color name="cat_all">#616161</color>
+</resources>

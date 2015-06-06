@@ -11,12 +11,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.LruCache;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,15 +27,10 @@ import java.io.IOException;
 
 public class MainActivity extends ActionBarActivity {
 
-    //    ListView mList;
     GridView mList;
-    //    AdapterViewFlipper mList;
-    TextView f, s, r;
     ImageButton right, left, center;
-
     DataBaseHelper sqlHelper;
     Cursor userCursor, ties, all;
-    //    SimpleCursorAdapter userAdapter;
     CustomCursorAdapter userAdapter;
     Context mContext;
     int pos;
@@ -44,30 +41,26 @@ public class MainActivity extends ActionBarActivity {
     NewElementDialog newElementDialog;
     int count = 0, rightElementId;
     Bitmap myBitmap1;
+    private LruCache<String, Bitmap> mMemoryCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         mList = (GridView) findViewById(R.id.list);
-//
         newElementDialog = new NewElementDialog();
         mContext = getApplicationContext();
         left = (ImageButton) findViewById(R.id.leftButton);
         right = (ImageButton) findViewById(R.id.imageRight);
         center = (ImageButton) findViewById(R.id.imageCenter);
-
         left.setBackgroundResource(R.drawable.back_selected);
         right.setBackgroundResource(R.drawable.back);
         center.setBackgroundResource(R.drawable.back);
-
-
         sqlHelper = new DataBaseHelper(getApplicationContext());
         isLeft = true;
         isLeftEmpty = true;
         isRightEmpty = true;
+
         // создаем базу данных
         try {
             sqlHelper.createDataBase();
@@ -75,7 +68,57 @@ public class MainActivity extends ActionBarActivity {
             throw new Error("Unable to create database");
         }
 
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+
+
     }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    public void loadBitmap(int resId, ImageView mImageView, String name, int redWidth, int regHeight) {
+        final String imageKey = String.valueOf(resId);
+
+        myBitmap1 = getBitmapFromMemCache(name);
+        if (myBitmap1 != null) {
+            mImageView.setImageBitmap(myBitmap1);
+            System.out.println("Image used.");
+
+        } else {
+            //mImageView.setImageResource(R.drawable.none);
+            myBitmap1 = decodeSampledBitmapFromResource(getResources(), resId, redWidth, regHeight);
+            addBitmapToMemoryCache(String.valueOf(name), myBitmap1);
+            mImageView.setImageBitmap(myBitmap1);
+            System.out.println("Image decoded.");
+
+            }
+
+        }
+
+
+
 
     @Override
     public void onResume() {
@@ -91,7 +134,7 @@ public class MainActivity extends ActionBarActivity {
 
             String[] headers = new String[]{DataBaseHelper.COLUMN_NAME, DataBaseHelper.COLUMN_YEAR};
 
-            userAdapter = new CustomCursorAdapter(this, userCursor, 1);
+            userAdapter = new CustomCursorAdapter(this, userCursor, 1, mMemoryCache);
             mList.setAdapter(userAdapter);
         } catch (SQLException ex) {
         }
@@ -105,9 +148,9 @@ public class MainActivity extends ActionBarActivity {
                         pos = userCursor.getInt(0);
                         if (isLeftEmpty) {
 
-                            System.gc();
-                            myBitmap1 = decodeSampledBitmapFromResource(getResources(), getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), 150, 150);
-                            left.setImageBitmap(myBitmap1);
+                           loadBitmap(getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), left, userCursor.getString(3), 100, 100);
+                            //myBitmap1 = decodeSampledBitmapFromResource(getResources(), getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), 150, 150);
+                            //left.setImageBitmap(myBitmap1);
 
                             //left.setImageResource(R.drawable.none);
                             left.setBackgroundResource(R.drawable.back);
@@ -121,27 +164,14 @@ public class MainActivity extends ActionBarActivity {
                             userCursor.moveToPosition(position);
                             tie = userCursor.getString(6).split("; ");
                             result = userCursor.getString(7).split("; ");
-
-
                         } else {
-
-                            System.gc();
-                            // s.setText(userCursor.getString(2)); mContext.getResources().getIdentifier(userCursor.getString(3), "drawable", mContext.getPackageName())
-                            myBitmap1 = decodeSampledBitmapFromResource(getResources(), getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), 150, 150);
-                            right.setImageBitmap(myBitmap1);
-                            //left.setBackgroundResource(R.drawable.back);
-                            //right.setBackgroundResource(R.drawable.back_selected);
+                            //myBitmap1 = decodeSampledBitmapFromResource(getResources(), getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), 150, 150);
+                            //right.setImageBitmap(myBitmap1);
+                            loadBitmap(getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), right, userCursor.getString(3), 100, 100);
                             isRightEmpty = false;
                             rightElementId = pos;
                             compare();
-
-
                         }
-
-
-//                        Toast.makeText(getApplicationContext(),
-//                                "Hello "+userCursor.getString(1),
-//                                Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -149,8 +179,6 @@ public class MainActivity extends ActionBarActivity {
 
     private void compare() {
         String newElement = tryElements(userCursor.getString(0));
-
-//        res = ties.getInt(pos);
         if (newElement.compareTo("0") == 0) {
             // r.setText("not");
             center.setImageResource(R.drawable.none);
@@ -159,22 +187,16 @@ public class MainActivity extends ActionBarActivity {
             if (all.getString(4).compareTo("1") == 0) {
                 center.setImageResource(R.drawable.none);
             } else {
-
-                System.gc();
                 //r.setText(all.getString(2));
-                myBitmap1 = decodeSampledBitmapFromResource(getResources(), getResources().getIdentifier(all.getString(3), "drawable", "com.example.ginvaell.db_ex"), 150, 150);
-                center.setImageBitmap(myBitmap1);
+               // myBitmap1 = decodeSampledBitmapFromResource(getResources(), getResources().getIdentifier(all.getString(3), "drawable", "com.example.ginvaell.db_ex"), 150, 150);
+               // center.setImageBitmap(myBitmap1);
+                loadBitmap(getResources().getIdentifier(userCursor.getString(3), "drawable", "com.example.ginvaell.db_ex"), center, userCursor.getString(3), 100, 100);
                 ContentValues cv = new ContentValues();
 
                 cv.put("open", "1");
-//            cv.put("ties", tieString);
-//            cv.put("res", resultString);
-
                 String where = DataBaseHelper.UID + "=" + newElement;
-//                    String where = "name="+newElement;
                 sqlHelper.database.update(DataBaseHelper.TABLE, cv, where, null);
                 userCursor = sqlHelper.database.query(DataBaseHelper.TABLE, null, "open=1", null, null, null, null);
-
 
                 userAdapter.notifyDataSetChanged();
                 String[] headers = new String[]{DataBaseHelper.COLUMN_NAME, DataBaseHelper.COLUMN_YEAR};
@@ -188,7 +210,6 @@ public class MainActivity extends ActionBarActivity {
                 newElementDialog.show(getSupportFragmentManager(), "new_el_tag");
 
                 all = sqlHelper.database.query(DataBaseHelper.TABLE, null, null, null, null, null, null);
-
 
             }
 
@@ -215,14 +236,6 @@ public class MainActivity extends ActionBarActivity {
 
         int id = item.getItemId();
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
-    }
-
-    public void onClick(View view) {
-//        mList.showNext();
-        //userCursor.moveToNext();
-        f.setText("");
-        s.setText("");
-        r.setText("");
     }
 
     public String tryElements(String element) {
@@ -322,7 +335,7 @@ public class MainActivity extends ActionBarActivity {
 //            userCursor = sqlHelper.database.rawQuery("select * from "+DataBaseHelper.TABLE, null);
         userCursor = sqlHelper.database.query(DataBaseHelper.TABLE, null, "open=1", null, null, null, null);
         all = sqlHelper.database.query(DataBaseHelper.TABLE, null, null, null, null, null, null);
-        userAdapter = new CustomCursorAdapter(this, userCursor, 1);
+        userAdapter = new CustomCursorAdapter(this, userCursor, 1, mMemoryCache);
         mList.setAdapter(userAdapter);
         left.setBackgroundResource(R.drawable.back_selected);
         right.setBackgroundResource(R.drawable.back);
@@ -337,22 +350,6 @@ public class MainActivity extends ActionBarActivity {
         Toast toast = Toast.makeText(mContext, text, duration);
         toast.show();
     }
-//    public void onSubmitClick(View view) {
-////        String id = userCursor.getString(0);
-////        ContentValues cv = new ContentValues();
-////        String newName = editText.getText().toString();
-////        cv.put(DataBaseHelper.COLUMN_NAME, newName);
-////        String where = DataBaseHelper.UID + "="+id;
-////        sqlHelper.database.update(DataBaseHelper.TABLE, cv, where, null);
-////        userCursor = sqlHelper.database.rawQuery("select * from "+DataBaseHelper.TABLE, null);
-//////        userAdapter.notifyDataSetChanged();
-////        String[] headers = new String[]{DataBaseHelper.COLUMN_NAME, DataBaseHelper.COLUMN_YEAR};
-////        userAdapter.changeCursor(userCursor);
-////        userAdapter = new SimpleCursorAdapter(this, android.R.layout.two_line_list_item,
-////                userCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
-////        //header.setText("Найдено элементов: " + String.valueOf(userCursor.getCount()));
-////        mList.setAdapter(userAdapter);
-//    }
 
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                          int reqWidth, int reqHeight) {
