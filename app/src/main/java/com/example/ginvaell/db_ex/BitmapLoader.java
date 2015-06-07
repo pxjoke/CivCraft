@@ -11,12 +11,9 @@ import android.widget.ImageView;
  * Created by pxjoke on 06.06.15.
  */
 public class BitmapLoader {
-    private LruCache<String, Bitmap> mMemoryCache;
-   // private final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-    //private final int cacheSize = maxMemory / 8;
-    private Bitmap bitmap;
-    private Context mContext;
-    private int resId;
+    private final LruCache<String, Bitmap> mMemoryCache;
+    private final Context mContext;
+
     public BitmapLoader(Context context){
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
@@ -30,21 +27,21 @@ public class BitmapLoader {
             }
         };
     }
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+    private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             mMemoryCache.put(key, bitmap);
         }
     }
 
-    public Bitmap getBitmapFromMemCache(String key) {
+    private Bitmap getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
     }
 
     public void load(String resName, ImageView mImageView, int redWidth, int regHeight) {
-        resId =  mContext.getResources().getIdentifier(resName, "drawable",mContext.getPackageName());
+        int resId = mContext.getResources().getIdentifier(resName, "drawable", mContext.getPackageName());
         final String imageKey = String.valueOf(resId);
 
-        bitmap = getBitmapFromMemCache(imageKey);
+        Bitmap bitmap = getBitmapFromMemCache(imageKey);
         if (bitmap != null) {
             mImageView.setImageBitmap(bitmap);
             System.out.println("Image used.");
@@ -60,8 +57,8 @@ public class BitmapLoader {
 
     }
 
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
+    private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -76,7 +73,7 @@ public class BitmapLoader {
         return BitmapFactory.decodeResource(res, resId, options);
     }
 
-    public static int calculateInSampleSize(
+    private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
