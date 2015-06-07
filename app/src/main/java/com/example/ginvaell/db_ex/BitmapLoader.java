@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 /**
  * Created by pxjoke on 06.06.15.
+ *
  */
 public class BitmapLoader {
     private final LruCache<String, Bitmap> mMemoryCache;
