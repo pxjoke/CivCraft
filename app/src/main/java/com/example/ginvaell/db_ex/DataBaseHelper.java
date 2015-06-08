@@ -17,8 +17,8 @@ import java.io.OutputStream;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     // путь к базе данных вашего приложения
-    private static String DB_PATH = "/data/data/com.example.ginvaell.db_ex/databases/";
-    private static String DB_NAME = "happy.db";
+    private static final String DB_PATH = "/data/data/com.example.ginvaell.db_ex/databases/";
+    private static final String DB_NAME = "happy.db";
     public SQLiteDatabase database;
     private final Context mContext;
     private static final String DATABASE_NAME = DB_NAME;

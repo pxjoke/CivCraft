@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="vertical"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
     android:id="@+id/new_el_wrapper"
-    >
-<ImageView
-    android:id="@+id/el_image"
-    android:layout_width="250dp"
-    android:layout_height="250dp"
-    android:scaleType="fitXY"
-    android:background="#FFFFFF"
-    android:contentDescription="@string/app_name"
-    android:layout_gravity="center"
-    android:padding="10dp"
-
-
-
-    />
-<TextView
-    android:id="@+id/el_description"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:textSize="30dp"
-    android:textColor="@color/abc_primary_text_material_dark"
-    android:layout_marginTop="20dp"
-     />
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/el_image"
+        android:layout_width="@dimen/new_element_image_width"
+        android:layout_height="@dimen/new_element_image_width"
+        android:layout_gravity="center"
+        android:background="#FFFFFF"
+        android:contentDescription="@string/app_name"
+        android:padding="10dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/none"
+        />
+
+    <TextView
+        android:id="@+id/el_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/abc_primary_text_material_dark"
+        android:textSize="30dp"
+        android:text="New element opened."/>
 </LinearLayout>

@@ -8,10 +8,11 @@
     >
     <ImageView
         android:id="@+id/imagepart"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/cellgrid_image_width"
+        android:layout_height="@dimen/cellgrid_image_width"
         android:scaleType="fitXY"
-        style="@style/Base.TextAppearance.AppCompat.Medium" />
+        style="@style/Base.TextAppearance.AppCompat.Medium"
+        android:src="@drawable/none" />
 
     <TextView
         android:id="@+id/textpart"

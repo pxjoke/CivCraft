@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -43,7 +44,6 @@ public class MainActivity extends ActionBarActivity {
     boolean isRightEmpty;
     NewElementDialog newElementDialog;
     int count = 0, rightElementId;
-    private LruCache<String, Bitmap> mMemoryCache;
     private BitmapLoader bitmapLoader;
     private int resId;
 
@@ -85,7 +85,6 @@ public class MainActivity extends ActionBarActivity {
             ties = sqlHelper.database.rawQuery("select * from ties", null);
 
             userCursor.moveToFirst();
-
 
             String[] headers = new String[]{DataBaseHelper.COLUMN_NAME, DataBaseHelper.COLUMN_YEAR};
 
@@ -378,5 +377,10 @@ public class MainActivity extends ActionBarActivity {
         userAdapter.changeCursor(userCursor);
 
         mList.setAdapter(userAdapter);
+    }
+
+    public void onShowStat(View view) {
+        Intent intent = new Intent(MainActivity.this, StatisticActivity.class);
+        startActivity(intent);
     }
 }
