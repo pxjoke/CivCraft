@@ -1,16 +1,11 @@
 package com.example.ginvaell.db_ex;
 
 import android.app.AlertDialog;
-<<<<<<< HEAD
-import android.app.DialogFragment;
-=======
->>>>>>> ginvaell11
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -40,15 +35,18 @@ public class MainActivity extends ActionBarActivity {
     Cursor userCursor, ties, all;
     CustomCursorAdapter userAdapter;
     Context mContext;
-    int pos;
+    int pos, parent1, parent2, child;
     String[] tie, result;
     boolean isLeft;
     boolean isLeftEmpty;
     boolean isRightEmpty;
     NewElementDialog newElementDialog;
     int count = 0, rightElementId;
+    Bitmap myBitmap1;
+    private LruCache<String, Bitmap> mMemoryCache;
     private BitmapLoader bitmapLoader;
     private int resId;
+    private DataHandler dataHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +61,20 @@ public class MainActivity extends ActionBarActivity {
         left.setBackgroundResource(R.drawable.back_selected);
         right.setBackgroundResource(R.drawable.back);
         center.setBackgroundResource(R.drawable.back);
-        sqlHelper = new DataBaseHelper(getApplicationContext());
+
+//        sqlHelper = new DataBaseHelper(getApplicationContext());
         isLeft = true;
         isLeftEmpty = true;
         isRightEmpty = true;
-        bitmapLoader = new BitmapLoader(MainActivity.this);
+        bitmapLoader = new BitmapLoader(getApplicationContext());
+        dataHandler = new DataHandler(mContext, mList,bitmapLoader);
+        sqlHelper = dataHandler.getSqlHelper();
         // создаем базу данных
-        try {
-            sqlHelper.createDataBase();
-        } catch (IOException ioe) {
-            throw new Error("Unable to create database");
-        }
+//        try {
+//            sqlHelper.createDataBase();
+//        } catch (IOException ioe) {
+//            throw new Error("Unable to create database");
+//        }
 
 
     }
@@ -81,43 +82,36 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onResume() {
         super.onResume();
-        try {
-            sqlHelper.openDataBase();
-            userCursor = sqlHelper.database.query(DataBaseHelper.TABLE, null, "open=1", null, null, null, null);
-            all = sqlHelper.database.query(DataBaseHelper.TABLE, null, null, null, null, null, null);
-            ties = sqlHelper.database.rawQuery("select * from ties", null);
+        dataHandler.openDataBaseAndGetData();
 
-            userCursor.moveToFirst();
-
-            String[] headers = new String[]{DataBaseHelper.COLUMN_NAME, DataBaseHelper.COLUMN_YEAR};
-
-            userAdapter = new CustomCursorAdapter(this, userCursor, 1, bitmapLoader);
-            mList.setAdapter(userAdapter);
-        } catch (SQLException ex) {
-        }
+        userCursor = dataHandler.getUserCursor();
+        all = dataHandler.getAll();
+        userAdapter = dataHandler.getUserAdapter();
 
         mList.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
                         count++;
-                        userCursor.moveToPosition(position);
-                        pos = userCursor.getInt(0);
+                        dataHandler.getUserCursor().moveToPosition(position);
+                        pos = dataHandler.getUserCursor().getInt(0);
                         if (isLeftEmpty) {
-                            bitmapLoader.load(userCursor.getString(3), left, 100, 100);
+                            bitmapLoader.load(dataHandler.getUserCursor().getString(3), left, 100, 100);
                             left.setBackgroundResource(R.drawable.back);
                             right.setBackgroundResource(R.drawable.back_selected);
-                           isLeftEmpty = false;
+                            isLeftEmpty = false;
+                            parent1 = pos;
                             if (!isRightEmpty) {
                                 compare();
                             }
-                            userCursor.moveToPosition(position);
-                            tie = userCursor.getString(6).split("; ");
-                            result = userCursor.getString(7).split("; ");
+                            dataHandler.getUserCursor().moveToPosition(position);
+                            tie = dataHandler.getUserCursor().getString(6).split("; ");
+                            result = dataHandler.getUserCursor().getString(7).split("; ");
                         } else {
-                           bitmapLoader.load(userCursor.getString(3), right, 100, 100);
+                            bitmapLoader.load(dataHandler.getUserCursor().getString(3), right, 100, 100);
                             isRightEmpty = false;
                             rightElementId = pos;
+                            parent2 = pos;
                             compare();
                         }
                     }
@@ -126,36 +120,17 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void compare() {
-        String newElement = tryElements(userCursor.getString(0));
-        if (newElement.compareTo("0") == 0) {
+        //String newElement = tryElements(userCursor.getString(0));
+        child = dataHandler.check(parent1, parent2);
+        if (child == 0) {
             center.setImageResource(R.drawable.none);
         } else {
-            all.moveToPosition(Integer.parseInt(newElement) - 1);
+            all.moveToPosition(child - 1);
             if (all.getString(4).compareTo("1") == 0) {
                 center.setImageResource(R.drawable.none);
             } else {
                 bitmapLoader.load(all.getString(3), center, 100, 100);
-<<<<<<< HEAD
-                ContentValues cv = new ContentValues();
-                cv.put("open", "1");
-                String where = DataBaseHelper.UID + "=" + newElement;
-                sqlHelper.database.update(DataBaseHelper.TABLE, cv, where, null);
-                userCursor = sqlHelper.database.query(DataBaseHelper.TABLE, null, "open=1", null, null, null, null);
 
-                userAdapter.notifyDataSetChanged();
-                String[] headers = new String[]{DataBaseHelper.COLUMN_NAME, DataBaseHelper.COLUMN_YEAR};
-                userAdapter.changeCursor(userCursor);
-
-                mList.setAdapter(userAdapter);
-
-//                newElementDialog = new NewElementDialog();
-//                newElementDialog.setDescription("Вы открыли " + all.getString(2) + "!");
-//                newElementDialog.setImg(all.getString(3));
-//                newElementDialog.setBitmapLoader(bitmapLoader);
-//                newElementDialog.show(getSupportFragmentManager(), "new_el_tag");
-=======
-
->>>>>>> ginvaell11
 
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 Fragment prev = getFragmentManager().findFragmentByTag("dialog");
@@ -164,17 +139,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 ft.addToBackStack(null);
 
-<<<<<<< HEAD
-                // Create and show the dialog.
-                DialogFragment newFragment = ElementOpenedDialog.newInstance(all.getString(3), "Blablabla", bitmapLoader);
-                newFragment.show(ft, "dialog");
-
-
-                all = sqlHelper.database.query(DataBaseHelper.TABLE, null, null, null, null, null, null);
-
-=======
                 dataHandler.updateDataInDataBase(child);
->>>>>>> ginvaell11
             }
 
         }
@@ -388,10 +353,5 @@ public class MainActivity extends ActionBarActivity {
         userAdapter.changeCursor(userCursor);
 
         mList.setAdapter(userAdapter);
-    }
-
-    public void onShowStat(View view) {
-        Intent intent = new Intent(MainActivity.this, StatisticActivity.class);
-        startActivity(intent);
     }
 }
