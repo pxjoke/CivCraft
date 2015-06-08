@@ -1,7 +1,10 @@
 package com.example.ginvaell.db_ex;
 
 import android.app.AlertDialog;
+<<<<<<< HEAD
 import android.app.DialogFragment;
+=======
+>>>>>>> ginvaell11
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.ContentValues;
@@ -132,6 +135,7 @@ public class MainActivity extends ActionBarActivity {
                 center.setImageResource(R.drawable.none);
             } else {
                 bitmapLoader.load(all.getString(3), center, 100, 100);
+<<<<<<< HEAD
                 ContentValues cv = new ContentValues();
                 cv.put("open", "1");
                 String where = DataBaseHelper.UID + "=" + newElement;
@@ -149,6 +153,9 @@ public class MainActivity extends ActionBarActivity {
 //                newElementDialog.setImg(all.getString(3));
 //                newElementDialog.setBitmapLoader(bitmapLoader);
 //                newElementDialog.show(getSupportFragmentManager(), "new_el_tag");
+=======
+
+>>>>>>> ginvaell11
 
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 Fragment prev = getFragmentManager().findFragmentByTag("dialog");
@@ -157,6 +164,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 ft.addToBackStack(null);
 
+<<<<<<< HEAD
                 // Create and show the dialog.
                 DialogFragment newFragment = ElementOpenedDialog.newInstance(all.getString(3), "Blablabla", bitmapLoader);
                 newFragment.show(ft, "dialog");
@@ -164,6 +172,9 @@ public class MainActivity extends ActionBarActivity {
 
                 all = sqlHelper.database.query(DataBaseHelper.TABLE, null, null, null, null, null, null);
 
+=======
+                dataHandler.updateDataInDataBase(child);
+>>>>>>> ginvaell11
             }
 
         }
