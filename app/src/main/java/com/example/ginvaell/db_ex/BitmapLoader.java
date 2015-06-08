@@ -58,6 +58,12 @@ public class BitmapLoader {
 
     }
 
+    public void loadWithoutCaching(String resName, ImageView mImageView, int redWidth, int regHeight){
+        int resId = mContext.getResources().getIdentifier(resName, "drawable", mContext.getPackageName());
+        Bitmap bitmap = decodeSampledBitmapFromResource(mContext.getResources(), resId, redWidth, regHeight);
+        mImageView.setImageBitmap(bitmap);
+        bitmap = null;
+    }
     private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                           int reqWidth, int reqHeight) {
 
@@ -96,4 +102,5 @@ public class BitmapLoader {
 
         return inSampleSize;
     }
+
 }
