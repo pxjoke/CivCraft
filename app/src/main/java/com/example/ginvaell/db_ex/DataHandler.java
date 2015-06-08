@@ -27,7 +27,7 @@ public class DataHandler {
 //        this.center = center;
         this.mContext = mContext;
         this.bitmapLoader = bitmapLoader;
-
+//gitt
         sqlHelper = new DataBaseHelper(mContext);
 
         try {
