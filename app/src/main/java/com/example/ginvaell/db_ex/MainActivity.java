@@ -1,6 +1,8 @@
 package com.example.ginvaell.db_ex;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -128,10 +130,15 @@ public class MainActivity extends ActionBarActivity {
                 center.setImageResource(R.drawable.none);
             } else {
                 bitmapLoader.load(all.getString(3), center, 100, 100);
-                newElementDialog = new NewElementDialog();
-                newElementDialog.setDescription("Вы открыли " + all.getString(2) + "!");
-                newElementDialog.setImg(all.getString(3));
-                newElementDialog.show(getSupportFragmentManager(), "new_el_tag");
+
+
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
                 dataHandler.updateDataInDataBase(child);
             }
 
