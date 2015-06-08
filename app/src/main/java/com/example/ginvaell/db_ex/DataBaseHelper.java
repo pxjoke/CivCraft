@@ -40,7 +40,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void createDataBase() throws IOException {
         boolean dbExist = checkDataBase();
 
-        if(dbExist){
+        if(!dbExist){
             //ничего не делать - база уже есть
         }else{
             //вызывая этот метод создаем пустую базу, позже она будет перезаписана
